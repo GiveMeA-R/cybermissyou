@@ -17,10 +17,10 @@ Một vài lời khen ngợi chân thành dành cho nàng sẽ giúp ba�
 
 Vậy một lời khen sâu sắc nhất là như thế nào? Có cần sử dụng những mẫu câu cầu kỳ, phức tạp không? Với câu hỏi này, Toplist xin được mách nhỏ đến bạn 3 kiểu khen đơn giản sau:
 
-Khen trực tiếp, đơn giản nhưng thật lòng và chân thành.
-Khen gián tiếp, thể hiện sự quan sát tinh tế.
-Khen vào tính cách, vẻ đẹp tâm hồn.
-"Mật ngọt chết ruồi" nên đừng ngại khen cô ấy nhé!
+  Khen trực tiếp, đơn giản nhưng thật lòng và chân thành.
+  Khen gián tiếp, thể hiện sự quan sát tinh tế.
+  Khen vào tính cách, vẻ đẹp tâm hồn.
+  "Mật ngọt chết ruồi" nên đừng ngại khen cô ấy nhé!
 
 3. Tôn trọng nàng và bạn bè của nàng
 
