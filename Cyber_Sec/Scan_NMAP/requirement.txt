@@ -1,0 +1,10 @@
+python-nmap
+ftputil
+requests
+pysmb
+fabric
+subprocess32
+ipstack
+pyowm
+wikipedia-api
+pymongo

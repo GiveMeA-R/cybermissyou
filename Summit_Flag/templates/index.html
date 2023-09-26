@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TCIS Cybersecurity Challenge</title>
+    <style>
+      body {
+        background-color: #282a36;
+        color: #50fa7b;
+        font-family: "Courier New", Courier, monospace;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .container {
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 1em;
+        text-align: center;
+      }
+      
+      h1 {
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+      }
+      
+      p {
+        font-size: 1.2em;
+      }
+      
+      a {
+        color: #8be9fd;
+        text-decoration: none;
+      }
+      
+      a:hover {
+        text-decoration: underline;
+      }
+      
+      .notification {
+        position: relative;
+        display: none;
+        background-color: #ffb86c;
+        color: #282a36;
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        margin-top: 10px;
+        animation-name: fadeOut;
+        animation-duration: 3s;
+      }
+      
+      .notification:before {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid #ffb86c;
+      }
+      
+      .notification-close-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 20px;
+        color: #282a36;
+        cursor: pointer;
+      }
+      
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      
+      
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to the TCIS Cybersecurity Challenge</h1>
+      <p>
+        This is a cybersecurity challenge for enhancing our skills and teamwork.
+        Use your knowledge, intuition, and every tool at your disposal to find
+        flags and earn points.
+      </p>
+      <p><a href="/submit">Submit your flag here</a></p>
+      <div id="notification" class="notification">
+        <div id="notification-message"></div>
+        <span id="notification-close-btn">&times;</span>
+      </div>
+      
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var socket = io();
+        var notificationTimeout;
+
+        socket.on("initial_flags", function (flags) {
+          // Update flag count if needed
+          // Here, you can add your logic to determine when to show the notification
+          var isNewFlagAvailable = true; // Change this to your actual condition
+
+          if (isNewFlagAvailable) {
+            var team = ""; // Initialize an empty team name
+            var flagCount = 0;
+
+            // Iterate through the flags object to find the team with the most flags
+            for (var key in flags) {
+              if (flags.hasOwnProperty(key)) {
+                if (flags[key] > flagCount) {
+                  team = key;
+                  flagCount = flags[key];
+                }
+              }
+            }
+
+            if (team !== "") {
+              var message =
+                "Congratulations, " +
+                team +
+                "! You have found a new vulnerability. The current total flags for " +
+                team +
+                " is " +
+                flagCount +
+                ".";
+              showNotification(message);
+            }
+          }
+        });
+
+        socket.on("notification", function (data) {
+          var message = data.message;
+          showNotification(message);
+        });
+
+        function showNotification(message) {
+          var notification = document.getElementById("notification");
+          var notificationMessage = document.getElementById("notification-message");
+          var closeBtn = document.getElementById("notification-close-btn");
+
+          clearTimeout(notificationTimeout); // Clear any previous timeout
+
+          notificationMessage.innerText = message;
+          notification.style.display = "block";
+
+          closeBtn.addEventListener("click", function () {
+            notification.style.display = "none";
+          });
+
+          notificationTimeout = setTimeout(function () {
+            notification.style.display = "none";
+          }, 30000);
+        }
+      });
+    </script>
+  </body>
+</html>

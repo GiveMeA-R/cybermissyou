@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <title>Submit Flag</title>
+    <style>
+      body {
+        background-color: #282a36;
+        color: #f8f8f2;
+        font-family: "Courier New", Courier, monospace;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      h3 {
+        text-align: center;
+      }
+
+      .form-control {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        background-color: #44475a;
+        color: #f8f8f2;
+      }
+
+      .error-message,
+      .success-message {
+        display: none;
+        background-color: #00b894;
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+
+      .error-message {
+        background-color: #ff7675;
+      }
+
+      .submit-btn {
+        background-color: #50fa7b;
+        border: none;
+        color: black;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        font-size: 16px;
+        margin: 20px auto;
+        cursor: pointer;
+        transition-duration: 0.4s;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 200px;
+      }
+
+      .submit-btn:hover {
+        background-color: white;
+        color: black;
+      }
+
+      .notification {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #00b894;
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        display: none;
+        z-index: 999;
+      }
+
+      .notification-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      #notification-message {
+        margin: 0;
+      }
+
+      #notification-close-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+      @media screen and (max-width: 1024px) {
+        .container {
+          max-width: 60%;
+          padding: 10px;
+          margin: 0 auto;
+        }
+        
+        .form-control {
+          margin-bottom: 10px;
+        }
+        
+        .submit-btn {
+          margin: 10px auto;
+        }
+      }
+      
+      @media screen and (max-width: 600px) {
+        .notification {
+          position: relative;
+          margin-top: 20px;
+        }
+      
+        .notification-message {
+          font-size: 14px;
+        }
+      
+        .notification-close-btn {
+          font-size: 12px;
+          padding: 5px 10px;
+        }
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Submit Flag</h3>
+      <div id="notification" class="notification">
+        <div class="notification-content">
+          <p id="notification-message"></p>
+          <button id="notification-close-btn">&times;</button>
+        </div>
+      </div>
+      <form method="POST" action="/submit">
+        <div class="form-control">
+          <label for="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your name"
+            required
+          />
+        </div>
+        <div class="form-control">
+          <label for="team">Team</label>
+          <input
+            type="text"
+            id="team"
+            name="team"
+            placeholder="Enter your team"
+            required
+          />
+        </div>
+        <div class="form-control">
+          <label for="flag">Flag</label>
+          <textarea
+            id="flag"
+            name="flag"
+            rows="5"
+            placeholder="Enter your flag here"
+            required
+          ></textarea>
+        </div>
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
+        <input type="submit" value="Submit" class="submit-btn" />
+      </form>
+      <button onclick="location.href='/'" class="submit-btn">
+        Back to Home
+      </button>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var socket = io();
+
+        socket.on("initial_flags", function (flags) {
+          updateFlagCount(flags);
+        });
+
+        socket.on("new_flag", function (data) {
+          var team = data.team;
+          var flagCount = data.flag_count;
+          var message = `Congratulations, ${team}! You have found a new vulnerability. The total number of flags for ${team} is now ${flagCount}.`;
+          showNotification(message);
+          updateFlagCount({ [team]: flagCount });
+        });
+
+        function showNotification(message) {
+          var notificationDiv = document.getElementById("notification");
+          var notificationMessage = document.getElementById(
+            "notification-message"
+          );
+          var closeBtn = document.getElementById("notification-close-btn");
+
+          notificationMessage.innerText = message;
+          notificationDiv.style.display = "block";
+
+          closeBtn.addEventListener("click", function () {
+            notificationDiv.style.display = "none";
+          });
+        }
+
+        function updateFlagCount(flags) {
+          var flagCounts = document.getElementsByClassName("flag-count");
+          for (var i = 0; i < flagCounts.length; i++) {
+            var team = flagCounts[i].getAttribute("data-team");
+            var count = flags[team] || 0;
+            flagCounts[i].innerText = count;
+          }
+        }
+
+        document
+          .querySelector("form")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            var nameValue = document.getElementById("name").value;
+            var teamValue = document.getElementById("team").value;
+            var flagValue = document.getElementById("flag").value;
+            var formData = new FormData();
+            formData.append("name", nameValue);
+            formData.append("team", teamValue);
+            formData.append("flag", flagValue);
+
+            fetch("/submit", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                var errorMessage = document.getElementById("error-message");
+                var successMessage = document.getElementById("success-message");
+
+                if (data.message === "Incorrect flag!") {
+                  errorMessage.innerText = "Incorrect flag!";
+                  errorMessage.style.display = "block";
+                  successMessage.style.display = "none";
+                } else if (data.message === "Correct flag!") {
+                  var team = teamValue;
+                  var flagCount = data.flag_count;
+                  var message = `Congratulations, ${team}! You have found a new vulnerability. The total number of flags for ${team} is now ${flagCount}.`;
+                  showNotification(message);
+                  updateFlagCount({ [team]: flagCount });
+
+                  errorMessage.innerText = "";
+                  errorMessage.style.display = "none";
+                  successMessage.innerText = "Correct flag!";
+                  successMessage.style.display = "block";
+                } else if (
+                  data.message === "Your team has already submitted this flag!"
+                ) {
+                  errorMessage.innerText =
+                    "Your team has already submitted this flag!";
+                  errorMessage.style.display = "block";
+                  successMessage.style.display = "none";
+                }
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+              });
+          });
+      });
+    </script>
+  </body>
+</html>
